@@ -78,42 +78,66 @@ namespace System.Numerics
         {
             try
             {
-                var decodedBytes = Convert.FromBase64String(Encoding.UTF8.GetString(_utf8Base64.Span));
-                var span = new ReadOnlySpan<byte>(decodedBytes);
-
-                T[] array;
-
                 if (typeof(T) == typeof(float))
                 {
-                    array = new T[span.Length / sizeof(float)];
-                    for (int i = 0; i < array.Length; i++)
+                    var decodedBytes = Convert.FromBase64String(Encoding.UTF8.GetString(_utf8Base64.Span));
+
+                    var floatArray = new float[decodedBytes.Length / sizeof(float)];
+
+                    for (int i = 0; i < floatArray.Length; i++)
                     {
-                        float value = BinaryPrimitives.ReadSingleBigEndian(span.Slice(i * sizeof(float), sizeof(float)));
-                        array[i] = (T)(object)value;
+                        floatArray[i] = BitConverter.ToSingle(decodedBytes.AsSpan(i * sizeof(float), sizeof(float)));
                     }
+
+                    return new EmbeddingVector<T>(floatArray as T[]);
                 }
-#if NET5_0_OR_GREATER
-                else if (typeof(T) == typeof(Half))
-                {
-                    array = new T[span.Length / sizeof(short)];
-                    for (int i = 0; i < array.Length; i++)
-                    {
-                        Half value = (Half)BinaryPrimitives.ReadHalfBigEndian(span.Slice(i * sizeof(short), sizeof(short)));
-                        array[i] = (T)(object)value;
-                    }
-                }
-#endif
                 else
                 {
                     throw new NotSupportedException($"Type {typeof(T)} is not supported.");
                 }
-
-                return new EmbeddingVector<T>(array);
             }
             catch (Exception e)
             {
                 throw new NotSupportedException(e.Message, e);
             }
+            //            try
+            //            {
+            //                var decodedBytes = Convert.FromBase64String(Encoding.UTF8.GetString(_utf8Base64.Span));
+            //                var span = new ReadOnlySpan<byte>(decodedBytes);
+
+            //                T[] array;
+
+            //                if (typeof(T) == typeof(float))
+            //                {
+            //                    array = new T[span.Length / sizeof(float)];
+            //                    for (int i = 0; i < array.Length; i++)
+            //                    {
+            //                        float value = BinaryPrimitives.ReadSingleBigEndian(span.Slice(i * sizeof(float), sizeof(float)));
+            //                        array[i] = (T)(object)value;
+            //                    }
+            //                }
+            //#if NET5_0_OR_GREATER
+            //                else if (typeof(T) == typeof(Half))
+            //                {
+            //                    array = new T[span.Length / sizeof(short)];
+            //                    for (int i = 0; i < array.Length; i++)
+            //                    {
+            //                        Half value = (Half)BinaryPrimitives.ReadHalfBigEndian(span.Slice(i * sizeof(short), sizeof(short)));
+            //                        array[i] = (T)(object)value;
+            //                    }
+            //                }
+            //#endif
+            //                else
+            //                {
+            //                    throw new NotSupportedException($"Type {typeof(T)} is not supported.");
+            //                }
+
+            //                return new EmbeddingVector<T>(array);
+            //            }
+            //            catch (Exception e)
+            //            {
+            //                throw new NotSupportedException(e.Message, e);
+            //            }
         }
 
         public override void Write(Stream stream, string format)
