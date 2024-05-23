@@ -15,8 +15,9 @@ namespace EmbeddingType
     {
         public static void Main(string[] args)
         {
-            Program p = new();
-            p.OpenAIGetEmbedding();
+            Program program = new();
+            program.VectorSearch();
+            program.OpenAIGetEmbedding();
         }
 
         public void VectorSearch()
