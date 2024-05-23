@@ -16,7 +16,7 @@ namespace EmbeddingType
         public static void Main(string[] args)
         {
             Program program = new();
-            program.VectorSearch();
+           // program.VectorSearch();
             program.OpenAIGetEmbedding();
         }
 
@@ -58,13 +58,9 @@ namespace EmbeddingType
 
         public void OpenAIGetEmbedding()
         {
-            ApiKeyCredential key = new("KEY");
-            EmbeddingClient client = new("text-embedding-3-small", key);
+            EmbeddingClient client = new("text-embedding-ada-002", Environment.GetEnvironmentVariable("OPENAI-API-KEY"));
 
-            string description =
-                "Best hotel in town if you like luxury hotels. They have an amazing infinity pool, a spa,"
-                + " and a really helpful concierge. The location is perfect -- right downtown, close to all"
-                + " the tourist attractions. We highly recommend this hotel.";
+            string description = "Hello world";
 
             Embedding embedding = client.GenerateEmbedding(description);
             ReadOnlyMemory<float> vector = embedding.Vector;
