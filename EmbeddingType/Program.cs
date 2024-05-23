@@ -16,7 +16,7 @@ namespace EmbeddingType
         public static void Main(string[] args)
         {
             Program program = new();
-           // program.VectorSearch();
+            // program.VectorSearch();
             program.OpenAIGetEmbedding();
         }
 
@@ -62,14 +62,32 @@ namespace EmbeddingType
 
             string description = "Hello world";
 
-            Embedding embedding = client.GenerateEmbedding(description);
-            ReadOnlyMemory<float> vector = embedding.Vector;
+            ClientResult<Embedding> response = client.GenerateEmbedding(description);
 
-            Console.WriteLine($"Dimension: {vector.Length}");
-            Console.WriteLine($"Floats: ");
-            for (int i = 0; i < vector.Length; i++)
+            ReadOnlyMemory<float> expactedVectors = response.Value.Vector;
+
+            using JsonDocument jsonDoc = JsonDocument.Parse(response.GetRawResponse().Content.ToStream());
+            JsonElement root = jsonDoc.RootElement;
+
+            // Navigate to the "embedding" value
+            if (root.TryGetProperty("data", out JsonElement dataElement) && dataElement.ValueKind == JsonValueKind.Array)
             {
-                Console.WriteLine($"  [{i}] = {vector.Span[i]}");
+                foreach (JsonElement element in dataElement.EnumerateArray())
+                {
+                    if (element.TryGetProperty("embedding", out JsonElement embeddingElement))
+                    {
+                        // Convert the Base64-encoded embedding to an EmbeddingVector
+                        EmbeddingVector vector = EmbeddingVector.FromBase64(Encoding.UTF8.GetBytes(embeddingElement.GetString()));
+
+                        // Convert the embedding to EmbeddingVector<float>
+                        EmbeddingVector<float> floatVector = vector.To<float>();
+
+                        // Check if the decoded embedding matches the expected values
+                        bool result = floatVector.Scalars.Span.SequenceEqual(expactedVectors.Span);
+                        // assert result == true
+                        Console.WriteLine($"Embedding decoding result: {result}");
+                    }
+                }
             }
         }
     }
