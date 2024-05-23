@@ -51,7 +51,6 @@ namespace EmbeddingType
 
                 // Check if the decoded embedding matches the expected values
                 bool result = floats.Scalars.Span.SequenceEqual(expactedVectors.Span);
-
                 Assert.IsTrue(result);
             }
         }
@@ -84,7 +83,6 @@ namespace EmbeddingType
 
                         // Check if the decoded embedding matches the expected values
                         bool result = floatVector.Scalars.Span.SequenceEqual(expactedVectors.Span);
-
                         Assert.IsTrue(result);
                     }
                 }
