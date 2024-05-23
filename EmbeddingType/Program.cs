@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text.Json;
 using System.Text;
 using OpenAI.Embeddings;
@@ -7,7 +6,7 @@ using Azure;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
 using System.ClientModel;
-using EmbeddingType;
+using NUnit.Framework;
 
 namespace EmbeddingType
 {
@@ -16,7 +15,7 @@ namespace EmbeddingType
         public static void Main(string[] args)
         {
             Program program = new();
-            // program.VectorSearch();
+            program.VectorSearch();
             program.OpenAIGetEmbedding();
         }
 
@@ -39,6 +38,8 @@ namespace EmbeddingType
                         }
                     });
 
+            ReadOnlyMemory<float> expactedVectors = response.Value.GetResults().First().Document.DescriptionVector;
+
             // Get the first raw document of the search result and deserialize the vector property.
             using JsonDocument jsonDoc = JsonDocument.Parse(response.GetRawResponse().Content.ToStream());
             JsonElement doc = jsonDoc.RootElement.EnumerateObject().First().Value.EnumerateArray().First();
@@ -48,11 +49,10 @@ namespace EmbeddingType
                 EmbeddingVector vector = EmbeddingVector.FromJson(Encoding.UTF8.GetBytes(descriptionVector.GetRawText()));
                 EmbeddingVector<float> floats = vector.To<float>();
 
-                // Print the elements
-                foreach (float scalar in floats.Scalars.Span)
-                {
-                    Console.WriteLine(scalar);
-                }
+                // Check if the decoded embedding matches the expected values
+                bool result = floats.Scalars.Span.SequenceEqual(expactedVectors.Span);
+
+                Assert.IsTrue(result);
             }
         }
 
@@ -84,8 +84,8 @@ namespace EmbeddingType
 
                         // Check if the decoded embedding matches the expected values
                         bool result = floatVector.Scalars.Span.SequenceEqual(expactedVectors.Span);
-                        // assert result == true
-                        Console.WriteLine($"Embedding decoding result: {result}");
+
+                        Assert.IsTrue(result);
                     }
                 }
             }
