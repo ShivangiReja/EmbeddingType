@@ -98,11 +98,29 @@ namespace System.Numerics
                     array = new T[span.Length / sizeof(short)];
                     for (int i = 0; i < array.Length; i++)
                     {
-                        Half value = (Half)BinaryPrimitives.ReadSingleLittleEndian(span.Slice(i * sizeof(short), sizeof(short)));
+                        Half value = (Half)BinaryPrimitives.ReadHalfLittleEndian(span.Slice(i * sizeof(short), sizeof(short)));
                         array[i] = (T)(object)value;
                     }
                 }
 #endif
+                else if (typeof(T) == typeof(byte))
+                {
+                    array = new T[span.Length];
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        byte value = span[i];
+                        array[i] = (T)(object)value;
+                    }
+                }
+                else if (typeof(T) == typeof(sbyte))
+                {
+                    array = new T[span.Length];
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        sbyte value = (sbyte)span[i];
+                        array[i] = (T)(object)value;
+                    }
+                }
                 else
                 {
                     throw new NotSupportedException($"Type {typeof(T)} is not supported.");

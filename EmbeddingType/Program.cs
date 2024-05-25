@@ -14,16 +14,14 @@ namespace EmbeddingType
     {
         public static void Main(string[] args)
         {
-            Program program = new();
-            program.VectorSearch();
-            program.OpenAIGetEmbedding();
+            VectorSearch();
+            OpenAIGetEmbedding();
         }
 
-        public void VectorSearch()
+        public static void VectorSearch()
         {
             Uri endpoint = new(Environment.GetEnvironmentVariable("SEARCH_ENDPOINT"));
-            string key = Environment.GetEnvironmentVariable("SEARCH_API_KEY");
-            AzureKeyCredential credential = new(key);
+            AzureKeyCredential credential = new(Environment.GetEnvironmentVariable("SEARCH_API_KEY"));
             string indexName = "mysearchindex";
 
             SearchClient searchClient = new SearchClient(endpoint, indexName, credential);
@@ -55,7 +53,7 @@ namespace EmbeddingType
             }
         }
 
-        public void OpenAIGetEmbedding()
+        public static void OpenAIGetEmbedding()
         {
             EmbeddingClient client = new("text-embedding-ada-002", Environment.GetEnvironmentVariable("OPENAI-API-KEY"));
 
