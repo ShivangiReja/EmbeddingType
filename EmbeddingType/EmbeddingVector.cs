@@ -10,7 +10,7 @@ namespace System.Numerics
 
         public static EmbeddingVector FromJson(ReadOnlyMemory<byte> utf8Json) => new JsonArrayVector(utf8Json);
 
-        public static EmbeddingVector FromBase64(ReadOnlyMemory<byte> utf8Base64) => new Base64Vector(utf8Base64);
+     //   public static EmbeddingVector FromBase64(ReadOnlyMemory<byte> utf8Base64) => new Base64Vector(utf8Base64);
 
         public static EmbeddingVector<T> FromScalars<T>(ReadOnlyMemory<T> scalars) => new EmbeddingVector<T>(scalars);
 
@@ -21,7 +21,7 @@ namespace System.Numerics
     {
         private readonly ReadOnlyMemory<T> _scalars;
 
-        internal EmbeddingVector(ReadOnlyMemory<T> scalars) => _scalars = scalars;
+        public EmbeddingVector(ReadOnlyMemory<T> scalars) => _scalars = scalars;
 
         public ReadOnlyMemory<T> Scalars => _scalars;
 
