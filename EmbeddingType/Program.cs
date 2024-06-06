@@ -74,7 +74,7 @@ namespace EmbeddingType
                     if (element.TryGetProperty("embedding", out JsonElement embeddingElement))
                     {
                         // Convert the Base64-encoded embedding to an EmbeddingVector
-                        EmbeddingVector vector = new Base64Vector(Encoding.UTF8.GetBytes(embeddingElement.GetString()));
+                        EmbeddingVector vector = EmbeddingVector.FromBase64(Encoding.UTF8.GetBytes(embeddingElement.GetString()));
 
                         // Convert the embedding to EmbeddingVector<float>
                         EmbeddingVector<float> floatVector = vector.To<float>();
